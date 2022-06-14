@@ -1,0 +1,15 @@
+{
+  "name": "sabd - sistema de automacao de banco de dados",
+  "version": "1.0.0",
+  "description": "Trabalho da disciplina de Lab. de Engenharia de Software",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-cron": "^3.0.0"
+  }
+}
