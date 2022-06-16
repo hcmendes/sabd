@@ -1,0 +1,3 @@
+nome_beneficiario,tipo_pessoa_beneficiario,cpf_cnpj_beneficiario,cod_susep,cod_ramo_seguro,ag_contratacao_seguro,num_proposta_seguro,dt_efetiv_proposta_seguro,dt_ini_vig_seguro,dt_fim_vig_seguro,dt_cancelamento_seguro,num_apolice,num_apolice_renovada,dt_emissao_apolice_seguro,num_endosso_seguro,dt_emissao_endosso_seguro,cod_motivo_endosso,func_vendedor,valor_parcela,dt_vencimento,qtde_parcelas
+Benjamin Arrola,,1234567890,,,,283423842370,,,,,,,,,,,,2000,20300101,20
+Jacinto Pinto,Pessoa física,987654321,1234,4321,111a,283423842369,20220520,20220527,,,,,,,,,,100.80,20250101,30
