@@ -12,9 +12,9 @@ Certifique-se de ter instalado os programas
 
 - atualize o arquivo `dados.csv` com os contratos a serem inseridos na base
 
-## Executando o cron
-
 - instale as dependências com o comando `npm install`
+
+## Executando o cron
 
 - execute o comando `node cron-ler-arquivo`
 
