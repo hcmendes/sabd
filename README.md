@@ -16,7 +16,7 @@ Certifique-se de ter instalado os programas
 
 ## Executando o cron
 
-- execute o comando `node cron-ler-arquivo`
+Execute o comando `node cron-ler-arquivo`
 
 ## Forçar processamento
 
