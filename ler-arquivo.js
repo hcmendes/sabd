@@ -63,58 +63,35 @@ module.exports = function lerArquivo() {
               return;
             }
 
-            inserirDados();
+            atualizarDb();
           });
         }
 
-        function inserirDados() {
+        function atualizarDb() {
 
           let inserts = [];
-          csvData.map(linha => {
-            const insert = {
-              statement: 'INSERT INTO contratos VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
-              values: [
-                linha.nome_beneficiario,
-                linha.tipo_pessoa_beneficiario,
-                linha.cpf_cnpj_beneficiario,
-                linha.cod_susep,
-                linha.cod_ramo_seguro,
-                linha.ag_contratacao_seguro,
-                linha.num_proposta_seguro,
-                linha.dt_efetiv_proposta_seguro,
-                linha.dt_ini_vig_seguro,
-                linha.dt_fim_vig_seguro,
-                linha.dt_cancelamento_seguro,
-                linha.num_apolice,
-                linha.num_apolice_renovada,
-                linha.dt_emissao_apolice_seguro,
-                linha.num_endosso_seguro,
-                linha.dt_emissao_endosso_seguro,
-                linha.cod_motivo_endosso,
-                linha.func_vendedor,
-                linha.valor_parcela,
-                linha.dt_vencimento,
-                linha.qtde_parcelas
-              ]
-            };
-            insert.values = insert.values.map(v => {
-              if (v === '') return null;
-              return v;
-            });
+          let updates = [];
+          csvData.map((linha, index) => {
 
-            inserts.push(insert);
+            if (linha.acao === 'i') {
+              inserirDados(linha, inserts);
+            } else if (linha.acao === 'a') {
+              atualizarDados(linha, updates);
+            } else {
+              throw new Error(`coluna "acao" inválida na linha ${index + 1}`);
+            }
           });
 
           function realizarInserts(indice) {
             if (!inserts[indice]) {
-              console.log(`base atualizada com sucesso. ${inserts.length} linhas processadas.`);
-              console.log('*** FIM: lendo arquivo ***');
+              console.log(`base atualizada com sucesso. ${inserts.length} novas linhas inseridas.`);
               return; // ponto de parada
             }
 
             connection.query(inserts[indice].statement, inserts[indice].values, (error, response) => {
               if (error) {
                 console.log(`erro ao inserir linha ${indice + 1}`);
+                console.error(error);
               }
 
               realizarInserts(indice + 1);
@@ -122,6 +99,103 @@ module.exports = function lerArquivo() {
           }
 
           realizarInserts(0);
+
+          function realizarUpdates(indice) {
+            if (!updates[indice]) {
+              console.log(`base atualizada com sucesso. ${updates.length} linhas existentes atualizadas.`);
+              console.log('*** FIM: lendo arquivo ***');
+              salvarArquivo();
+              return; // ponto de parada
+            }
+
+            connection.query(updates[indice].statement, updates[indice].values, (error, response) => {
+              if (error) {
+                console.log(`erro ao atualizar linha ${indice + 1}`);
+                console.error(error);
+              }
+
+              realizarUpdates(indice + 1);
+            });
+          }
+
+          realizarUpdates(0);
+
+          function salvarArquivo() {
+            const stream = fastcsv.format();
+            stream.pipe(fs.createWriteStream(`relatorios/${Date.now()}.csv`));
+
+            stream.write(['acao', 'nome_beneficiario', 'tipo_pessoa_beneficiario', 'cpf_cnpj_beneficiario', 'cod_susep', 'cod_ramo_seguro', 'ag_contratacao_seguro', 'num_proposta_seguro', 'dt_efetiv_proposta_seguro', 'dt_ini_vig_seguro', 'dt_fim_vig_seguro', 'dt_cancelamento_seguro', 'num_apolice', 'num_apolice_renovada', 'dt_emissao_apolice_seguro', 'num_endosso_seguro', 'dt_emissao_endosso_seguro', 'cod_motivo_endosso', 'func_vendedor', 'valor_parcela', 'dt_vencimento', 'qtde_parcelas']);
+            csvData.map(c => stream.write(c));
+            stream.end();
+          }
+        }
+
+        function inserirDados(linha, inserts) {
+          const insert = {
+            statement: 'INSERT INTO contratos VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
+            values: [
+              linha.nome_beneficiario,
+              linha.tipo_pessoa_beneficiario,
+              linha.cpf_cnpj_beneficiario,
+              linha.cod_susep,
+              linha.cod_ramo_seguro,
+              linha.ag_contratacao_seguro,
+              linha.num_proposta_seguro,
+              linha.dt_efetiv_proposta_seguro,
+              linha.dt_ini_vig_seguro,
+              linha.dt_fim_vig_seguro,
+              linha.dt_cancelamento_seguro,
+              linha.num_apolice,
+              linha.num_apolice_renovada,
+              linha.dt_emissao_apolice_seguro,
+              linha.num_endosso_seguro,
+              linha.dt_emissao_endosso_seguro,
+              linha.cod_motivo_endosso,
+              linha.func_vendedor,
+              linha.valor_parcela,
+              linha.dt_vencimento,
+              linha.qtde_parcelas
+            ]
+          };
+          insert.values = insert.values.map(v => {
+            if (v === '') return null;
+            return v;
+          });
+          inserts.push(insert);
+        }
+
+        function atualizarDados(linha, updates) {
+          const update = {
+            statement: `UPDATE contratos SET nome_beneficiario = ?,tipo_pessoa_beneficiario = ?,cpf_cnpj_beneficiario = ?,cod_susep = ?,cod_ramo_seguro = ?,ag_contratacao_seguro = ?,dt_efetiv_proposta_seguro = ?,dt_ini_vig_seguro = ?,dt_fim_vig_seguro = ?,dt_cancelamento_seguro = ?,num_apolice = ?,num_apolice_renovada = ?,dt_emissao_apolice_seguro = ?,num_endosso_seguro = ?,dt_emissao_endosso_seguro = ?,cod_motivo_endosso = ?,func_vendedor = ?,valor_parcela = ?,dt_vencimento = ?,qtde_parcelas = ? WHERE num_proposta_seguro = ?`,
+            values: [
+              linha.nome_beneficiario,
+              linha.tipo_pessoa_beneficiario,
+              linha.cpf_cnpj_beneficiario,
+              linha.cod_susep,
+              linha.cod_ramo_seguro,
+              linha.ag_contratacao_seguro,
+              linha.dt_efetiv_proposta_seguro,
+              linha.dt_ini_vig_seguro,
+              linha.dt_fim_vig_seguro,
+              linha.dt_cancelamento_seguro,
+              linha.num_apolice,
+              linha.num_apolice_renovada,
+              linha.dt_emissao_apolice_seguro,
+              linha.num_endosso_seguro,
+              linha.dt_emissao_endosso_seguro,
+              linha.cod_motivo_endosso,
+              linha.func_vendedor,
+              linha.valor_parcela,
+              linha.dt_vencimento,
+              linha.qtde_parcelas,
+              linha.num_proposta_seguro
+            ]
+          };
+          update.values = update.values.map(v => {
+            if (v === '') return null;
+            return v;
+          });
+          updates.push(update);
         }
 
       });
