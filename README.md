@@ -1,3 +1,7 @@
+## Descrição
+
+Backend do sabd
+
 ## Programas necessários
 
 Certifique-se de ter instalado os programas
@@ -22,7 +26,7 @@ Execute o comando `node cron-ler-arquivo`
 
 Para processar o `dados.csv` imediatamente, execute `node ler-arquivo-agora`
 
-## A Fazer
+## Executando o web server
 
-- definir estratégia de logs
-- salvar relatório de inconsistências
+O web server precisa ser executado para que o frontend da aplicação funcione. 
+Para rodar o webserver, execute o comando `node iniciar-express.js`
